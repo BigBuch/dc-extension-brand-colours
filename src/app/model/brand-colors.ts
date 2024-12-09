@@ -1,8 +1,14 @@
 interface BrandColor {
   name: string;
   color: string;
+  class: string;
 }
 
+interface BrandColorValue {
+  name: string;
+  color: string;
+  class: string;
+}
 interface BrandColorGroup {
   name: string;
   colors: BrandColor[];
@@ -19,4 +25,4 @@ interface BrandColors {
   failure?: boolean; // Indicates if we failed to load the brand colours content item.
 }
 
-export { BrandColor, BrandColors };
+export { BrandColor, BrandColors, BrandColorValue };

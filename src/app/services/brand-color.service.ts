@@ -1,8 +1,14 @@
-import { Injectable } from '@angular/core';
-import { SDK } from 'dc-extensions-sdk';
 import { ContentClient } from 'dc-delivery-sdk-js';
-import { BrandColors, BrandColor } from '../model/brand-colors';
+import { SDK } from 'dc-extensions-sdk';
+
+import { Injectable } from '@angular/core';
+
 import { BrandColorParameters } from '../model/brand-color-parameters';
+import {
+	BrandColor,
+	BrandColors,
+	BrandColorValue,
+} from '../model/brand-colors';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +16,7 @@ import { BrandColorParameters } from '../model/brand-color-parameters';
 export class BrandColorService {
 
   private sdk: SDK;
-  activeColor: string;
+  activeColor: BrandColorValue;
   params: BrandColorParameters;
   colors: BrandColors = {
     name: 'Loading...',
@@ -27,11 +33,11 @@ export class BrandColorService {
     try {
       // See index.html for sdk init.
       // tslint:disable-next-line: no-string-literal
-      const sdk: SDK<string, BrandColorParameters> = await window['extensionsSdkInstance'];
+      const sdk: SDK<BrandColorValue, BrandColorParameters> = await window['extensionsSdkInstance'];
       sdk.frame.startAutoResizer();
 
       this.activeColor = await sdk.field.getValue();
-      this.selected = (this.activeColor == null) ? null : { name: this.activeColor, color: this.activeColor };
+      this.selected = (this.activeColor == null) ? null : { name: this.activeColor.name || '', color: this.activeColor.color || '', class: this.activeColor.class|| '' };
       this.params = { ...sdk.params.installation, ...sdk.params.instance } as BrandColorParameters;
 
       const client = new ContentClient({
@@ -44,7 +50,7 @@ export class BrandColorService {
 
       this.prepareColors();
 
-      this.selected = this.findExistingColor(this.activeColor);
+      this.selected = this.findExistingColor(this.activeColor.name);
 
       requestAnimationFrame(this.checkHeight.bind(this));
     } catch (e) {
@@ -56,7 +62,6 @@ export class BrandColorService {
       };
     }
   }
-
   private prepareColors() {
     this.colors.colors = this.combineColorGroups(this.params.groups);
 
@@ -75,8 +80,8 @@ export class BrandColorService {
     return [].concat.apply([], groupObjs);
   }
 
-  private getColorKey(color: BrandColor): string {
-    return this.params.useNames ? color.name : color.color;
+  private getColorKey(color: BrandColor): BrandColor {
+    return color;
   }
 
   selectColor(color: BrandColor) {
@@ -86,9 +91,9 @@ export class BrandColorService {
   }
 
   findExistingColor(color: string) {
-    let bColor = color == null ? null : this.colors.colors.find(c => this.getColorKey(c).toLowerCase() === color.toLowerCase());
+    let bColor = color == null ? null : this.colors.colors.find(c => this.getColorKey(c).name === color);
     if (bColor == null && color != null) {
-      bColor = { color, name: color };
+      bColor = { color, name: color, class: 'aaaa' };
     }
     return bColor;
   }

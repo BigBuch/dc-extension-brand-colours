@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
+import { BrandColor, BrandColors } from './model/brand-colors';
 import { BrandColorService } from './services/brand-color.service';
-import { BrandColors, BrandColor } from './model/brand-colors';
 
 @Component({
   selector: 'amp-root',
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
 
   selectColor(color: BrandColor) {
     this.colorSource.selectColor(color);
+    console.log(this.colorSource);
     this.selectedColor = this.colorSource.selected;
   }
 }
